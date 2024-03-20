@@ -1,47 +1,77 @@
 import User from "../models/UserModel.js";
- 
+const bcrypt = await import('bcrypt');
+
+
 export const getUsers = async (req, res) => {
     try {
         const users = await User.find();
         res.json(users);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 }
- 
+
 export const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         res.json(user);
     } catch (error) {
-        res.status(404).json({message: error.message});
+        res.status(404).json({ message: error.message });
     }
 }
- 
+
 export const saveUser = async (req, res) => {
-    const user = new User(req.body);
+    const { name, email, password, dateOfBirth, placeOfBirth, gender, province, regency, district, village, noWa } = req.body;
+    //hash password 
+    const hashedPassword = await bcrypt.hash(password,10);
+
+    const user = new User({
+        name,
+        email,
+        password: hashedPassword, // Gunakan password yang sudah di-hash
+        dateOfBirth,
+        placeOfBirth,
+        gender,
+        province,
+        regency,
+        district,
+        village,
+        noWa
+    });
+
+    
     try {
         const inserteduser = await user.save();
-        res.status(201).json(inserteduser);
+        res.status(201).json({
+            data : inserteduser,
+            status : 1
+        });
     } catch (error) {
-        res.status(400).json({message: error.message});
+
+        if (error.code && error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+            // Error: Duplikat kunci (duplicate key error)
+            res.status(400).json({ status: 0, message: "Email already exists" });
+        } else {
+            // Error lainnya
+            res.status(400).json({ status: 0, message: error.message });
+        }
     }
 }
- 
+
 export const updateUser = async (req, res) => {
     try {
-        const updateduser = await User.updateOne({_id:req.params.id}, {$set: req.body});
+        const updateduser = await User.updateOne({ _id: req.params.id }, { $set: req.body });
         res.status(200).json(updateduser);
     } catch (error) {
-        res.status(400).json({message: error.message});
+        res.status(400).json({ message: error.message });
     }
 }
- 
+
 export const deleteUser = async (req, res) => {
     try {
-        const deleteduser = await User.deleteOne({_id:req.params.id});
+        const deleteduser = await User.deleteOne({ _id: req.params.id });
         res.status(200).json(deleteduser);
     } catch (error) {
-        res.status(400).json({message: error.message});
+        res.status(400).json({ message: error.message });
     }
 }
