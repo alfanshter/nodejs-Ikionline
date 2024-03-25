@@ -11,10 +11,10 @@ export const province = async (req, res) => {
 }
 
 export const regencies = async (req, res) => {
-    const { provinceName } = req.params;
+    const { provinceId } = req.params;
 
     try {
-        const province = await Wilayah.findOne({ name: provinceName });
+        const province = await Wilayah.findOne({ id: provinceId });
         console.log(province);
         if (!province) {
             return res.status(404).json({

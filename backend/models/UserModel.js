@@ -35,28 +35,36 @@ const userSchema = mongoose.Schema({
         required: true
     },
     province: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Province',
         required: true
     },
     regency: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Regency',
         required: true
     },
     district: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'District',
         required: true
     },
     village: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Village',
         required: true
     },
     noWa: {
         type: String,
-        required: true
+        required: true,
+        unique : true,
+    }
+}, {
+    toJson: {
+        transform : function ( doc, ret){
+            delete ret.password;
+            ret.status = 0;
+        }
     }
 });
 

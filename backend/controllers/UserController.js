@@ -21,7 +21,7 @@ export const getUserById = async (req, res) => {
 }
 
 export const saveUser = async (req, res) => {
-    const { name, email, password, dateOfBirth, placeOfBirth, gender, province, regency, district, village, noWa } = req.body;
+    const { name, email, password, dateOfBirth, placeOfBirth, gender, province, regency, district, village, noWa ,address } = req.body;
     //hash password 
     const hashedPassword = await bcrypt.hash(password,10);
 
@@ -31,12 +31,13 @@ export const saveUser = async (req, res) => {
         password: hashedPassword, // Gunakan password yang sudah di-hash
         dateOfBirth,
         placeOfBirth,
-        gender,
         province,
         regency,
         district,
         village,
-        noWa
+        address,
+        noWa,
+        gender,
     });
 
     
@@ -51,7 +52,10 @@ export const saveUser = async (req, res) => {
         if (error.code && error.code === 11000 && error.keyPattern && error.keyPattern.email) {
             // Error: Duplikat kunci (duplicate key error)
             res.status(400).json({ status: 0, message: "Email already exists" });
-        } else {
+        } else if (error.keyPattern.noWa) {
+            res.status(400).json({ status: 0, message: "No Wa already exists" });
+            
+        }else {
             // Error lainnya
             res.status(400).json({ status: 0, message: error.message });
         }

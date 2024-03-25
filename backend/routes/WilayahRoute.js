@@ -10,7 +10,7 @@ import {
 
 //wilayah
 router.get('/province', province);
-router.get('/province/:provinceName', regencies);
+router.get('/province/:provinceId', regencies);
 router.get('/district/:provinceId/:regencyId/', district);
 router.get('/village/:provinceId/:regencyId/:districtId', village);
 
