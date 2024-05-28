@@ -58,7 +58,8 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
         unique : true,
-    }
+    },
+    jwtSecret: { type: String, default: '' },
 }, {
     toJson: {
         transform : function ( doc, ret){

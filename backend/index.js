@@ -6,8 +6,12 @@ import bodyParser from "body-parser";
 import UserRoute from "./routes/UserRoute.js";
 import versiRoute from "./routes/VersiRoute.js";
 import addressRoute from "./routes/AddressRoute.js";
+//import env
+import dotenv from 'dotenv';
 
 
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
 

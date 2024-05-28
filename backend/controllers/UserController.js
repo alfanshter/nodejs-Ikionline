@@ -24,16 +24,16 @@ export const getUserById = async (req, res) => {
 }
 
 export const saveUser = async (req, res) => {
-    const { name, email, password,confirmPassword, dateOfBirth, placeOfBirth, gender, province, regency, district, village, noWa ,address } = req.body;
+    const { name, email, password, confirmPassword, dateOfBirth, placeOfBirth, gender, province, regency, district, village, noWa, address } = req.body;
     //hash password 
     if (password !== confirmPassword) {
         return res.status(201).json({
-            data : null,
-            status : 0,
-            message : 'Password tidak sama'
+            data: null,
+            status: 0,
+            message: 'Password tidak sama'
         });
     }
-    const hashedPassword = await bcrypt.hash(password,10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
         name,
@@ -50,22 +50,45 @@ export const saveUser = async (req, res) => {
         gender,
     });
 
-    
+
+
     try {
-        const inserteduser = await user.save();
-        res.status(201).json({
-            data : inserteduser,
-            status : 1
+        // // Buat secret key baru untuk pengguna
+        // const newJwtSecret = crypto.randomBytes(64).toString('hex');
+        // // Simpan secret key baru di database
+        // user.jwtSecret = newJwtSecret;
+
+        const inserUser = await user.save();
+        const payload = {
+            name: inserUser.name,
+            email: inserUser.email,
+            id: inserUser.id
+        }
+
+        const secret = process.env.JWT_SECRET;
+
+        const expired = 60 * 60 * 1;
+        const token = jwt.sign(payload, secret, {
+            expiresIn: expired // 
+        });
+
+
+        res.status(200).json({
+            data: inserUser,
+            status: 1,
+            message: "Pendaftaran berhasil",
+            token
+
         });
     } catch (error) {
-
+        
         if (error.code && error.code === 11000 && error.keyPattern && error.keyPattern.email) {
             // Error: Duplikat kunci (duplicate key error)
-            res.status(400).json({ status: 0, message: "Email already exists" });
+            res.status(409).json({ status: 0, message: "Email already exists" });
         } else if (error.keyPattern.noWa) {
-            res.status(400).json({ status: 0, message: "No Wa already exists" });
-            
-        }else {
+            res.status(409).json({ status: 0, message: "No Wa already exists" });
+
+        } else {
             // Error lainnya
             res.status(400).json({ status: 0, message: error.message });
         }
