@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 //Route
 import UserRoute from "./routes/UserRoute.js";
 import versiRoute from "./routes/VersiRoute.js";
-import wilayahRoute from "./routes/WilayahRoute.js";
+import addressRoute from "./routes/AddressRoute.js";
 
 
 
@@ -39,7 +39,7 @@ const apiKeyCheck = (req, res, next) => {
 
 app.use(apiKeyCheck);
 
-app.use(wilayahRoute);
+app.use(addressRoute);
 app.use(UserRoute);
 app.use(versiRoute);
 app.use((req, res, next) => {

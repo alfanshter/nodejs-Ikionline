@@ -1,6 +1,9 @@
 import User from "../models/UserModel.js";
 const bcrypt = await import('bcrypt');
 
+import jwt from 'jsonwebtoken';
+const crypto = await import('crypto');
+
 
 export const getUsers = async (req, res) => {
     try {
@@ -21,8 +24,15 @@ export const getUserById = async (req, res) => {
 }
 
 export const saveUser = async (req, res) => {
-    const { name, email, password, dateOfBirth, placeOfBirth, gender, province, regency, district, village, noWa ,address } = req.body;
+    const { name, email, password,confirmPassword, dateOfBirth, placeOfBirth, gender, province, regency, district, village, noWa ,address } = req.body;
     //hash password 
+    if (password !== confirmPassword) {
+        return res.status(201).json({
+            data : null,
+            status : 0,
+            message : 'Password tidak sama'
+        });
+    }
     const hashedPassword = await bcrypt.hash(password,10);
 
     const user = new User({

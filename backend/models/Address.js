@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const wilayahSchema = mongoose.Schema({
+const addressSchema = mongoose.Schema({
     id: {
         type: String
     },
@@ -41,6 +41,6 @@ const wilayahSchema = mongoose.Schema({
 
 });
 
-const WilayahModel = mongoose.model('wilayah', wilayahSchema);
+const AddressModel = mongoose.model('addres', addressSchema);
 
-export default WilayahModel;
+export default AddressModel;

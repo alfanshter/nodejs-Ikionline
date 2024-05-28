@@ -6,12 +6,12 @@ import {
     regencies,
     district,
     village
-} from "../controllers/WilayahController.js";
+} from "../controllers/AddressController.js";
 
 //wilayah
 router.get('/province', province);
 router.get('/province/:provinceId', regencies);
-router.get('/district/:provinceId/:regencyId/', district);
-router.get('/village/:provinceId/:regencyId/:districtId', village);
+router.get('/district/:regencyId', district);
+router.get('/village/:districtId', village);
 
 export default router
