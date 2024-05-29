@@ -1,3 +1,4 @@
+import { use } from "bcrypt/promises.js";
 import User from "../models/UserModel.js";
 const bcrypt = await import('bcrypt');
 
@@ -111,4 +112,64 @@ export const deleteUser = async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
+}
+
+export const loginUser = async (req,res) => {
+    const {email,password} = req.body;
+
+    //cari pengguna berdasarkan email 
+    const user = await User.findOne({email});
+
+    //jika email tidak ada
+    if (!user) {
+        return res.status(401).json({
+            message : "email tidak ditemukan",
+            status : 0
+        })
+    }
+
+    //cek password 
+    const isPasswordInvalid = await bcrypt.compare(password,user.password)
+    //jika password salah
+    if (!isPasswordInvalid) {
+        return res.status(401).json({
+            message : "Invalid email or password",
+            status : 0
+        })
+    }
+    //====bikin token====
+    //bikin payload 
+    const payload = {
+        name : user.name,
+        email : user.email,
+        id : user.id
+    }
+
+    //bikin secret
+    const secret = process.env.JWT_SECRET
+    //bikin expired waktu 
+    const expired = 60 * 60 * 24 * 365
+    //bikin token 
+    const token = jwt.sign(payload,secret, {
+        expiresIn : expired
+    })
+
+    //kirim response ke user
+    return res.status(200).json({
+        message : "Login berhasil",
+        status : 1,
+        data : user,
+        token
+    })
+
+
+
+
+
+
+
+
+    return res.status(200).json({
+        data : user
+    })
 }

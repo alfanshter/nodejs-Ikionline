@@ -6,7 +6,8 @@ import {
     getUserById,
     saveUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    loginUser
 } from "../controllers/UserController.js";
 
 
@@ -21,6 +22,7 @@ router.get('/users/:id', getUserById);
 router.post('/users', saveUser);
 router.patch('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
+router.post('/login', loginUser);
  
 
 //OTP
