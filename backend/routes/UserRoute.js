@@ -7,7 +7,8 @@ import {
     saveUser,
     updateUser,
     deleteUser,
-    loginUser
+    loginUser,
+    logout
 } from "../controllers/UserController.js";
 
 
@@ -16,6 +17,10 @@ import {
     getOtp
 } from "../controllers/OtpController.js";
  
+import {
+    accessValidation
+} from "../middleware/authMiddleware.js";
+
  
 router.get('/users', getUsers);
 router.get('/users/:id', getUserById);
@@ -23,6 +28,7 @@ router.post('/users', saveUser);
 router.patch('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
 router.post('/login', loginUser);
+router.post('/logout', accessValidation, logout);
  
 
 //OTP

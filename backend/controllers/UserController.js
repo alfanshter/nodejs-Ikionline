@@ -4,6 +4,7 @@ const bcrypt = await import('bcrypt');
 
 import jwt from 'jsonwebtoken';
 const crypto = await import('crypto');
+import { blacklistToken } from '../middleware/authMiddleware.js';
 
 
 export const getUsers = async (req, res) => {
@@ -82,7 +83,7 @@ export const saveUser = async (req, res) => {
 
         });
     } catch (error) {
-        
+
         if (error.code && error.code === 11000 && error.keyPattern && error.keyPattern.email) {
             // Error: Duplikat kunci (duplicate key error)
             res.status(409).json({ status: 0, message: "Email already exists" });
@@ -114,35 +115,35 @@ export const deleteUser = async (req, res) => {
     }
 }
 
-export const loginUser = async (req,res) => {
-    const {email,password} = req.body;
+export const loginUser = async (req, res) => {
+    const { email, password } = req.body;
 
     //cari pengguna berdasarkan email 
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
 
     //jika email tidak ada
     if (!user) {
         return res.status(401).json({
-            message : "email tidak ditemukan",
-            status : 0
+            message: "email tidak ditemukan",
+            status: 0
         })
     }
 
     //cek password 
-    const isPasswordInvalid = await bcrypt.compare(password,user.password)
+    const isPasswordInvalid = await bcrypt.compare(password, user.password)
     //jika password salah
     if (!isPasswordInvalid) {
         return res.status(401).json({
-            message : "Invalid email or password",
-            status : 0
+            message: "Invalid email or password",
+            status: 0
         })
     }
     //====bikin token====
     //bikin payload 
     const payload = {
-        name : user.name,
-        email : user.email,
-        id : user.id
+        name: user.name,
+        email: user.email,
+        id: user.id
     }
 
     //bikin secret
@@ -150,26 +151,36 @@ export const loginUser = async (req,res) => {
     //bikin expired waktu 
     const expired = 60 * 60 * 24 * 365
     //bikin token 
-    const token = jwt.sign(payload,secret, {
-        expiresIn : expired
+    const token = jwt.sign(payload, secret, {
+        expiresIn: expired
     })
 
     //kirim response ke user
     return res.status(200).json({
-        message : "Login berhasil",
-        status : 1,
-        data : user,
+        message: "Login berhasil",
+        status: 1,
+        data: user,
         token
     })
+}
 
+export const logout = async (req, res) => {
+    //ambil token pada authorizaton
+    const { authorization } = req.headers
+    //jika token gk ada 
+    if (!authorization) {
+        return res.status(401).json({
+            message: "token tidak sesuai",
+            status: 0
+        })
+    }
 
-
-
-
-
-
+    //split token bearer
+    const token = authorization.split(' ')[1]
+    await blacklistToken(token)
 
     return res.status(200).json({
-        data : user
+        message: "logout success",
+        status: 0
     })
 }
